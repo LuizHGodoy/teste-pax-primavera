@@ -1,0 +1,89 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgres"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  uuid     String  @id @default(uuid())
+  email    String  @unique
+  name     String?
+  password String
+}
+
+model Endereco {
+  uuid        String  @id @default(uuid())
+  logradouro  String
+  numero      String?
+  complemento String?
+  bairro      String
+  cidade      String
+  estado      String
+  cep         String
+
+  clientes Cliente[]
+}
+
+model Cliente {
+  uuid                   String      @id @default(uuid())
+  nome                   String
+  documento              String      @unique
+  enderecoUuid           String
+  telefone               String?
+  email                  String      @unique
+  dataNascimentoFundacao DateTime?
+  tipo                   TipoCliente
+
+  vendas   Venda[]
+  Endereco Endereco? @relation(fields: [enderecoUuid], references: [uuid])
+}
+
+enum TipoCliente {
+  FISICA
+  JURIDICA
+}
+
+model Venda {
+  uuid             String   @id @default(uuid())
+  clienteUuid      String
+  dataVenda        DateTime @default(now())
+  totalVenda       Float
+  descontoAplicado Float?   @default(0)
+
+  cliente         Cliente        @relation(fields: [clienteUuid], references: [uuid])
+  itensDoCarrinho ItemCarrinho[]
+}
+
+model ItemCarrinho {
+  uuid               String    @id @default(uuid())
+  vendaUuid          String
+  planoSelecionado   Plano     @relation(fields: [planoUuid], references: [uuid])
+  servicosVinculados Servico[] @relation("ServicoItemCarrinho")
+  planoUuid          String
+
+  venda Venda @relation(fields: [vendaUuid], references: [uuid])
+}
+
+model Plano {
+  uuid      String @id @default(uuid())
+  nome      String @unique
+  descricao String
+  precoBase Float
+
+  itensCarrinho ItemCarrinho[]
+}
+
+model Servico {
+  uuid      String @id @default(uuid())
+  nome      String
+  descricao String
+  preco     Float
+
+  itensCarrinho ItemCarrinho[] @relation("ServicoItemCarrinho")
+}
