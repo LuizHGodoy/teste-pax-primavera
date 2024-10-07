@@ -1,10 +1,12 @@
 import { Body, Controller, Get, Post, Query } from "@nestjs/common";
+import { ApiTags } from "@nestjs/swagger";
 import { User } from "@prisma/client";
 import { IsPublic } from "src/common/decorators/is-public.decorator";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UserEntity } from "./entities/user-entity";
 import { UsersService } from "./users.service";
 
+@ApiTags("Usuario")
 @Controller("usuarios")
 export class UserController {
   constructor(private readonly userService: UsersService) {}

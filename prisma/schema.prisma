@@ -20,7 +20,7 @@ model User {
 model Endereco {
   uuid        String  @id @default(uuid())
   logradouro  String
-  numero      String?
+  numero      String
   complemento String?
   bairro      String
   cidade      String
@@ -31,14 +31,14 @@ model Endereco {
 }
 
 model Cliente {
-  uuid                   String      @id @default(uuid())
-  nome                   String
-  documento              String      @unique
-  enderecoUuid           String
-  telefone               String?
-  email                  String      @unique
-  dataNascimentoFundacao DateTime?
-  tipo                   TipoCliente
+  uuid           String      @id @default(uuid())
+  nome           String
+  documento      String      @unique
+  enderecoUuid   String
+  telefone       String?
+  email          String      @unique
+  dataNascimento DateTime?
+  tipo           TipoCliente
 
   vendas   Venda[]
   Endereco Endereco? @relation(fields: [enderecoUuid], references: [uuid])
@@ -55,6 +55,7 @@ model Venda {
   dataVenda        DateTime @default(now())
   totalVenda       Float
   descontoAplicado Float?   @default(0)
+  vendedorUuid     String
 
   cliente         Cliente        @relation(fields: [clienteUuid], references: [uuid])
   itensDoCarrinho ItemCarrinho[]
