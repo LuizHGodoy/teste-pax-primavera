@@ -3,6 +3,7 @@ import {
 	Injectable,
 	NotFoundException,
 } from "@nestjs/common";
+import { VendaStatus } from "@prisma/client";
 import { PrismaService } from "src/services/prisma/prisma.service";
 import { CreateVendaDto } from "./dto/create-venda.dto";
 import { UpdateVendaDto } from "./dto/update-venda.dto";
@@ -17,9 +18,9 @@ export class VendasService {
 			clienteUuid,
 			planoUuid,
 			servicosAdicionaisUuids,
-			totalVenda,
 			descontoAplicado,
 			vendedorUuid,
+			status = VendaStatus.ATIVA,
 		} = createVendaDto;
 
 		await this.validateRelations(
@@ -27,6 +28,42 @@ export class VendasService {
 			planoUuid,
 			servicosAdicionaisUuids,
 		);
+
+		const plano = await this.prisma.plano.findUnique({
+			where: { uuid: planoUuid },
+		});
+
+		if (!plano) {
+			throw new BadRequestException("Plano não encontrado");
+		}
+
+		const servicos = await this.prisma.servico.findMany({
+			where: { uuid: { in: servicosAdicionaisUuids } },
+		});
+
+		const valorServicos = servicos.reduce(
+			(total, servico) => total + servico.preco,
+			0,
+		);
+		let totalVenda = plano.precoBase + valorServicos;
+
+		if (descontoAplicado) {
+			if (descontoAplicado < 0 || descontoAplicado > 30) {
+				throw new BadRequestException("O desconto deve ser entre 0% e 30%");
+			}
+			totalVenda -= totalVenda * (descontoAplicado / 100);
+		}
+
+		const vendasAtivas = await this.prisma.venda.count({
+			where: {
+				clienteUuid: clienteUuid,
+				status: VendaStatus.ATIVA,
+			},
+		});
+
+		if (vendasAtivas >= 10) {
+			throw new BadRequestException("O cliente já possui 10 vendas ativas.");
+		}
 
 		const venda = await this.prisma.venda.create({
 			data: {
@@ -38,6 +75,7 @@ export class VendasService {
 				totalVenda,
 				descontoAplicado,
 				vendedorUuid,
+				status,
 			},
 			include: {
 				cliente: true,

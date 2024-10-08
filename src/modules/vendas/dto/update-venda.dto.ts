@@ -1,5 +1,12 @@
 import { ApiProperty, PartialType } from "@nestjs/swagger";
-import { IsArray, IsNumber, IsOptional, IsUUID } from "class-validator";
+import { VendaStatus } from "@prisma/client";
+import {
+	IsArray,
+	IsNumber,
+	IsOptional,
+	IsString,
+	IsUUID,
+} from "class-validator";
 import { CreateVendaDto } from "./create-venda.dto";
 
 export class UpdateVendaDto extends PartialType(CreateVendaDto) {
@@ -37,4 +44,9 @@ export class UpdateVendaDto extends PartialType(CreateVendaDto) {
 	@IsOptional()
 	@IsUUID()
 	vendedorUuid?: string;
+
+	@ApiProperty({ description: "Status da venda", required: false })
+	@IsOptional()
+	@IsString()
+	status?: VendaStatus;
 }

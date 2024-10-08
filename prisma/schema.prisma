@@ -50,17 +50,24 @@ enum TipoCliente {
 }
 
 model Venda {
-  uuid             String   @id @default(uuid())
+  uuid             String      @id @default(uuid())
   clienteUuid      String
-  dataVenda        DateTime @default(now())
+  dataVenda        DateTime    @default(now())
   totalVenda       Float
-  descontoAplicado Float?   @default(0)
+  descontoAplicado Float?      @default(0)
   vendedorUuid     String
+  status           VendaStatus @default(ATIVA)
 
   cliente   Cliente   @relation(fields: [clienteUuid], references: [uuid])
   plano     Plano     @relation(fields: [planoUuid], references: [uuid])
   planoUuid String
   servicos  Servico[]
+}
+
+enum VendaStatus {
+  ATIVA
+  FINALIZADA
+  CANCELADA
 }
 
 model Plano {

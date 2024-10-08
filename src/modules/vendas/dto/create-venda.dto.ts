@@ -1,9 +1,11 @@
 import { ApiProperty } from "@nestjs/swagger";
+import { VendaStatus } from "@prisma/client";
 import {
 	IsArray,
 	IsNotEmpty,
 	IsNumber,
 	IsOptional,
+	IsString,
 	IsUUID,
 } from "class-validator";
 
@@ -38,4 +40,9 @@ export class CreateVendaDto {
 	@IsNotEmpty()
 	@IsUUID()
 	vendedorUuid: string;
+
+	@ApiProperty({ description: "Status da venda", required: false })
+	@IsOptional()
+	@IsString()
+	status?: VendaStatus;
 }
