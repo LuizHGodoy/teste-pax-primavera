@@ -72,19 +72,54 @@ export class ClienteService {
 		}
 	}
 
-	findAll() {
-		return `This action returns all cliente`;
+	async findAll(): Promise<ClienteEntity[]> {
+		const clientes = await this.prisma.cliente.findMany();
+		return clientes.map((cliente) => new ClienteEntity(cliente));
 	}
 
-	findOne(id: number) {
-		return `This action returns a #${id} cliente`;
+	async findOne(uuid: string): Promise<ClienteEntity> {
+		const cliente = await this.prisma.cliente.findUnique({
+			where: { uuid },
+		});
+
+		if (!cliente) {
+			throw new HttpException("Cliente não encontrado", HttpStatus.NOT_FOUND);
+		}
+
+		return new ClienteEntity(cliente);
 	}
 
-	update(id: number, updateClienteDto: UpdateClienteDto) {
-		return `This action updates a #${id} cliente`;
+	async update(
+		uuid: string,
+		updateClienteDto: UpdateClienteDto,
+	): Promise<ClienteEntity> {
+		const cliente = await this.prisma.cliente.findUnique({
+			where: { uuid },
+		});
+
+		if (!cliente) {
+			throw new HttpException("Cliente não encontrado", HttpStatus.NOT_FOUND);
+		}
+
+		const updatedCliente = await this.prisma.cliente.update({
+			where: { uuid },
+			data: updateClienteDto,
+		});
+
+		return new ClienteEntity(updatedCliente);
 	}
 
-	remove(id: number) {
-		return `This action removes a #${id} cliente`;
+	async remove(uuid: string): Promise<void> {
+		const cliente = await this.prisma.cliente.findUnique({
+			where: { uuid },
+		});
+
+		if (!cliente) {
+			throw new HttpException("Cliente não encontrado", HttpStatus.NOT_FOUND);
+		}
+
+		await this.prisma.cliente.delete({
+			where: { uuid },
+		});
 	}
 }

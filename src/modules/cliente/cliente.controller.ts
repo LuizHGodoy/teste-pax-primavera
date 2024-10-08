@@ -20,31 +20,31 @@ export class ClienteController {
   @Get()
   @ApiOperation({ summary: 'Listar todos os clientes' })
   @ApiResponse({ status: 200, description: 'Lista de clientes retornada com sucesso' })
-  findAll() {
+  async findAll(): Promise<ClienteEntity[]> {
     return this.clienteService.findAll();
   }
 
-  @Get(':id')
-  @ApiOperation({ summary: 'Buscar cliente por ID' })
+  @Get(':uuid')
+  @ApiOperation({ summary: 'Buscar cliente por UUID' })
   @ApiResponse({ status: 200, description: 'Cliente encontrado' })
   @ApiResponse({ status: 404, description: 'Cliente não encontrado' })
-  findOne(@Param('id') id: string) {
-    return this.clienteService.findOne(+id);
+  async findOne(@Param('uuid') uuid: string): Promise<ClienteEntity> {
+    return this.clienteService.findOne(uuid);
   }
 
-  @Patch(':id')
+  @Patch(':uuid')
   @ApiOperation({ summary: 'Atualizar cliente' })
   @ApiResponse({ status: 200, description: 'Cliente atualizado com sucesso' })
   @ApiResponse({ status: 404, description: 'Cliente não encontrado' })
-  update(@Param('id') id: string, @Body() updateClienteDto: UpdateClienteDto) {
-    return this.clienteService.update(+id, updateClienteDto);
+  async update(@Param('uuid') uuid: string, @Body() updateClienteDto: UpdateClienteDto): Promise<ClienteEntity> {
+    return this.clienteService.update(uuid, updateClienteDto);
   }
 
-  @Delete(':id')
+  @Delete(':uuid')
   @ApiOperation({ summary: 'Remover cliente' })
   @ApiResponse({ status: 200, description: 'Cliente removido com sucesso' })
   @ApiResponse({ status: 404, description: 'Cliente não encontrado' })
-  remove(@Param('id') id: string) {
-    return this.clienteService.remove(+id);
+  async remove(@Param('uuid') uuid: string): Promise<void> {
+    return this.clienteService.remove(uuid);
   }
 }
