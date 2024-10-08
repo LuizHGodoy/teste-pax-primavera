@@ -6,6 +6,7 @@ import {
 import { PrismaService } from "src/services/prisma/prisma.service";
 import { CreatePlanDto } from "./dto/create-plan.dto";
 import { UpdatePlanDto } from "./dto/update-plan.dto";
+import { PlanEntity } from "./entities/plan.entity";
 
 @Injectable()
 export class PlansService {
@@ -30,13 +31,22 @@ export class PlansService {
 		};
 	}
 
-	async findAll() {
-		const plans = await this.prisma.plano.findMany();
-		return {
-			status: 200,
-			message: "Planos listados com sucesso",
-			data: plans,
-		};
+	async findAll(page = 1, limit = 10) {
+		if (page < 1) {
+			throw new BadRequestException("A página deve ser maior ou igual a 1");
+		}
+
+		if (limit < 1) {
+			throw new BadRequestException("O limite deve ser maior ou igual a 1");
+		}
+
+		const skip = (page - 1) * limit;
+
+		const plans = await this.prisma.plano.findMany({
+			skip,
+			take: limit,
+		});
+		return plans.map((plan) => new PlanEntity(plan));
 	}
 
 	async findOne(uuid: string) {

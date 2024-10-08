@@ -6,6 +6,7 @@ import {
 import { PrismaService } from "src/services/prisma/prisma.service";
 import { CreateVendaDto } from "./dto/create-venda.dto";
 import { UpdateVendaDto } from "./dto/update-venda.dto";
+import { VendaEntity } from "./entities/venda.entity";
 
 @Injectable()
 export class VendasService {
@@ -52,19 +53,32 @@ export class VendasService {
 		};
 	}
 
-	async findAll() {
+	async findAll(page = 1, limit = 10) {
+		if (page < 1) {
+			throw new BadRequestException("A página deve ser maior ou igual a 1");
+		}
+
+		if (limit < 1) {
+			throw new BadRequestException("O limite deve ser maior ou igual a 1");
+		}
+
+		const skip = (page - 1) * limit;
+
 		const vendas = await this.prisma.venda.findMany({
+			skip,
+			take: limit,
 			include: {
 				cliente: true,
 				plano: true,
 				servicos: true,
 			},
 		});
-		return {
-			status: 200,
-			message: "Vendas listadas com sucesso",
-			data: vendas,
-		};
+
+		if (vendas.length === 0 && page > 1) {
+			throw new NotFoundException("A página solicitada não contém resultados");
+		}
+
+		return vendas.map((venda) => new VendaEntity(venda));
 	}
 
 	async findOne(uuid: string) {

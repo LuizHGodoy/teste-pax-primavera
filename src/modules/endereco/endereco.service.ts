@@ -1,5 +1,7 @@
 import {
 	BadRequestException,
+	HttpException,
+	HttpStatus,
 	Injectable,
 	InternalServerErrorException,
 	NotFoundException,
@@ -8,6 +10,7 @@ import { Prisma } from "@prisma/client";
 import { PrismaService } from "src/services/prisma/prisma.service";
 import { CreateEnderecoDto } from "./dto/create-endereco.dto";
 import { UpdateEnderecoDto } from "./dto/update-endereco.dto";
+import { EnderecoEntity } from "./entities/endereco.entity";
 
 @Injectable()
 export class EnderecoService {
@@ -36,12 +39,36 @@ export class EnderecoService {
 		};
 	}
 
-	async findAll() {
-		const enderecos = await this.prisma.endereco.findMany();
-		return {
-			status: 200,
-			data: enderecos,
-		};
+	async findAll(page = 1, limit = 10) {
+		if (page < 1) {
+			throw new HttpException(
+				"A página deve ser maior ou igual a 1",
+				HttpStatus.BAD_REQUEST,
+			);
+		}
+
+		if (limit < 1) {
+			throw new HttpException(
+				"O limite deve ser maior ou igual a 1",
+				HttpStatus.BAD_REQUEST,
+			);
+		}
+
+		const skip = (page - 1) * limit;
+
+		const enderecos = await this.prisma.endereco.findMany({
+			skip,
+			take: limit,
+		});
+
+		if (enderecos.length === 0 && page > 1) {
+			throw new HttpException(
+				"A página solicitada não contém resultados",
+				HttpStatus.NOT_FOUND,
+			);
+		}
+
+		return enderecos.map((endereco) => new EnderecoEntity(endereco));
 	}
 
 	async findOne(uuid: string) {

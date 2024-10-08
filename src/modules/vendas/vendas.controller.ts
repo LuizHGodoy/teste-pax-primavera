@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateVendaDto } from './dto/create-venda.dto';
 import { UpdateVendaDto } from './dto/update-venda.dto';
@@ -19,9 +19,12 @@ export class VendasController {
   @Get()
   @ApiOperation({ summary: 'Listar todas as vendas' })
   @ApiResponse({ status: 200, description: 'Lista de vendas retornada com sucesso' })
-  findAll() {
-    return this.vendasService.findAll();
-  }
+  findAll(
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10
+) {
+    return this.vendasService.findAll(page, limit);
+}
 
   @Get(':uuid')
   @ApiOperation({ summary: 'Buscar venda por UUID' })

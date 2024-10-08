@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AditionalServicesService } from './aditional-services.service';
 import { CreateAditionalServiceDto } from './dto/create-aditional-service.dto';
@@ -20,8 +20,11 @@ export class AditionalServicesController {
   @Get()
   @ApiOperation({ summary: 'Listar todos os serviços adicionais' })
   @ApiResponse({ status: 200, description: 'Lista de serviços adicionais retornada com sucesso' })
-  findAll() {
-    return this.aditionalServicesService.findAll();
+  findAll(
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10
+  ) {
+    return this.aditionalServicesService.findAll(page, limit);
   }
 
   @Get(':uuid')

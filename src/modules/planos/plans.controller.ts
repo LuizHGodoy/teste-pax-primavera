@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreatePlanDto } from './dto/create-plan.dto';
 import { UpdatePlanDto } from './dto/update-plan.dto';
@@ -20,8 +20,11 @@ export class PlansController {
   @Get()
   @ApiOperation({ summary: 'Listar todos os planos' })
   @ApiResponse({ status: 200, description: 'Lista de planos retornada com sucesso' })
-  findAll() {
-    return this.plansService.findAll();
+  findAll(
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10
+  ) {
+      return this.plansService.findAll(page, limit);
   }
 
   @Get(':uuid')

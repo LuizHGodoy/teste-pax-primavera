@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateEnderecoDto } from './dto/create-endereco.dto';
 import { UpdateEnderecoDto } from './dto/update-endereco.dto';
@@ -19,8 +19,11 @@ export class EnderecoController {
   @Get()
   @ApiOperation({ summary: 'Listar todos os endereços' })
   @ApiResponse({ status: 200, description: 'Lista de endereços retornada com sucesso' })
-  findAll() {
-    return this.enderecoService.findAll();
+  findAll(
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10
+  ) {
+    return this.enderecoService.findAll(page, limit);
   }
 
   @Get(':uuid')

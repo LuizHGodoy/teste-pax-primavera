@@ -6,6 +6,7 @@ import {
 import { PrismaService } from "src/services/prisma/prisma.service";
 import { CreateAditionalServiceDto } from "./dto/create-aditional-service.dto";
 import { UpdateAditionalServiceDto } from "./dto/update-aditional-service.dto";
+import { ServicoEntity } from "./entities/aditional-service.entity";
 
 @Injectable()
 export class AditionalServicesService {
@@ -30,13 +31,23 @@ export class AditionalServicesService {
 		};
 	}
 
-	async findAll() {
-		const services = await this.prisma.servico.findMany();
-		return {
-			status: 200,
-			message: "Serviços adicionais listados com sucesso",
-			data: services,
-		};
+	async findAll(page = 1, limit = 10) {
+		if (page < 1) {
+			throw new BadRequestException("A página deve ser maior ou igual a 1");
+		}
+
+		if (limit < 1) {
+			throw new BadRequestException("O limite deve ser maior ou igual a 1");
+		}
+
+		const skip = (page - 1) * limit;
+
+		const services = await this.prisma.servico.findMany({
+			skip,
+			take: limit,
+		});
+
+		return services.map((service) => new ServicoEntity(service));
 	}
 
 	async findOne(uuid: string) {

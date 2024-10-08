@@ -72,8 +72,35 @@ export class ClienteService {
 		}
 	}
 
-	async findAll(): Promise<ClienteEntity[]> {
-		const clientes = await this.prisma.cliente.findMany();
+	async findAll(page = 1, limit = 10): Promise<ClienteEntity[]> {
+		if (page < 1) {
+			throw new HttpException(
+				"A página deve ser maior ou igual a 1",
+				HttpStatus.BAD_REQUEST,
+			);
+		}
+
+		if (limit < 1) {
+			throw new HttpException(
+				"O limite deve ser maior ou igual a 1",
+				HttpStatus.BAD_REQUEST,
+			);
+		}
+
+		const skip = (page - 1) * limit;
+
+		const clientes = await this.prisma.cliente.findMany({
+			skip,
+			take: limit,
+		});
+
+		if (clientes.length === 0 && page > 1) {
+			throw new HttpException(
+				"A página solicitada não contém resultados",
+				HttpStatus.NOT_FOUND,
+			);
+		}
+
 		return clientes.map((cliente) => new ClienteEntity(cliente));
 	}
 

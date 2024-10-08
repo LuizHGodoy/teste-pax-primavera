@@ -24,4 +24,8 @@ export class VendaEntity {
 
 	@ApiProperty()
 	dataVenda: Date;
+
+	constructor(partial: Partial<VendaEntity>) {
+		Object.assign(this, partial);
+	}
 }
