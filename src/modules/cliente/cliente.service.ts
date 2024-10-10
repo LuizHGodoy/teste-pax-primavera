@@ -65,6 +65,7 @@ export class ClienteService {
 
 			return new ClienteEntity(result);
 		} catch (error) {
+			console.error(error);
 			throw new HttpException(
 				"Erro ao criar cliente ou endereço",
 				HttpStatus.INTERNAL_SERVER_ERROR,
