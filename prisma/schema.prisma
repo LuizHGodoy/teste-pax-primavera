@@ -27,7 +27,7 @@ model Endereco {
   estado      String
   cep         String
 
-  clientes Cliente[]
+  cliente Cliente[]
 }
 
 model Cliente {
@@ -41,7 +41,7 @@ model Cliente {
   tipo           TipoCliente
 
   vendas   Venda[]
-  Endereco Endereco? @relation(fields: [enderecoUuid], references: [uuid])
+  endereco Endereco? @relation(fields: [enderecoUuid], references: [uuid])
 }
 
 enum TipoCliente {

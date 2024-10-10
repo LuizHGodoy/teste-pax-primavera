@@ -93,6 +93,9 @@ export class ClienteService {
 		const clientes = await this.prisma.cliente.findMany({
 			skip,
 			take: limit,
+			include: {
+				endereco: true,
+			},
 		});
 
 		if (clientes.length === 0 && page > 1) {
@@ -108,6 +111,9 @@ export class ClienteService {
 	async findOne(uuid: string): Promise<ClienteEntity> {
 		const cliente = await this.prisma.cliente.findUnique({
 			where: { uuid },
+			include: {
+				endereco: true,
+			},
 		});
 
 		if (!cliente) {
@@ -129,9 +135,26 @@ export class ClienteService {
 			throw new HttpException("Cliente não encontrado", HttpStatus.NOT_FOUND);
 		}
 
+		const clientPayload = {
+			...updateClienteDto,
+			endereco: undefined,
+		};
+
+		const enderecoPayload = updateClienteDto.endereco;
+
+		if (enderecoPayload) {
+			await this.prisma.endereco.update({
+				where: { uuid: cliente.enderecoUuid },
+				data: enderecoPayload,
+			});
+		}
+
 		const updatedCliente = await this.prisma.cliente.update({
 			where: { uuid },
-			data: updateClienteDto,
+			data: clientPayload,
+			include: {
+				endereco: true,
+			},
 		});
 
 		return new ClienteEntity(updatedCliente);
