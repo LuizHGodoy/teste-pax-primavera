@@ -3,7 +3,7 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ClienteService } from './cliente.service';
 import { CreateClienteDto } from './dto/create-cliente.dto';
 import { UpdateClienteDto } from './dto/update-cliente.dto';
-import { ClienteEntity } from './entities/cliente.entity';
+import { ClienteEntity, ReturnClient } from './entities/cliente.entity';
 
 @ApiTags('Cliente')
 @Controller('clientes')
@@ -23,7 +23,7 @@ export class ClienteController {
   async findAll(
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10
-  ): Promise<ClienteEntity[]> {
+  ): Promise<ReturnClient> {
     return this.clienteService.findAll(page, limit);
   }
 

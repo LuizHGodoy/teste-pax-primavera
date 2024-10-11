@@ -3,7 +3,6 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 async function main() {
-	// Criar usuários
 	const existingUser = await prisma.user.findUnique({
 		where: { email: "usuario51@example.com" },
 	});
@@ -18,7 +17,6 @@ async function main() {
 			},
 		}));
 
-	// Criar endereços
 	const endereco = await prisma.endereco.create({
 		data: {
 			logradouro: "Rua Exemplo",
@@ -31,7 +29,6 @@ async function main() {
 		},
 	});
 
-	// Criar clientes
 	const existingCliente = await prisma.cliente.findUnique({
 		where: { documento: "123.456.789-00" },
 	});
@@ -41,7 +38,7 @@ async function main() {
 		(await prisma.cliente.create({
 			data: {
 				nome: "Cliente Exemplo",
-				documento: "123.456.789-00", // Altere para um documento único se necessário
+				documento: "123.456.789-00",
 				enderecoUuid: endereco.uuid,
 				telefone: "123456789",
 				email: "cliente@example.com",
@@ -50,7 +47,6 @@ async function main() {
 			},
 		}));
 
-	// Criar planos
 	const existingPlano = await prisma.plano.findUnique({
 		where: { nome: "Plano Básico" },
 	});
@@ -65,7 +61,6 @@ async function main() {
 			},
 		}));
 
-	// Criar serviços
 	const servico = await prisma.servico.create({
 		data: {
 			nome: "Serviço Exemplo",
@@ -73,22 +68,6 @@ async function main() {
 			preco: 29.99,
 		},
 	});
-
-	// Criar vendas
-	// const venda = await prisma.venda.create({
-	//   data: {
-	//     clienteUuid: cliente.uuid,
-	//     totalVenda: 129.99,
-	//     descontoAplicado: 0,
-	//     vendedorUuid: user.uuid,
-	//     planoUuid: plano.uuid,
-	//     servicos: {
-	//       create: {
-	//         uuid: servico.uuid,
-	//       },
-	//     },
-	//   },
-	// });
 
 	console.log({ user, endereco, cliente, plano, servico /* venda */ });
 }

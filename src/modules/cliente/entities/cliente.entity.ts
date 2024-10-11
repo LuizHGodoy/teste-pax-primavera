@@ -14,3 +14,8 @@ export class ClienteEntity {
 		Object.assign(this, partial);
 	}
 }
+
+export interface ReturnClient {
+	clients: ClienteEntity[];
+	totalPages: number;
+}

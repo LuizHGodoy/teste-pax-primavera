@@ -41,5 +41,5 @@ export class CreateClienteDto {
 	})
 	@IsOptional()
 	@IsDateString()
-	dataNascimento?: string;
+	dataNascimento?: Date;
 }

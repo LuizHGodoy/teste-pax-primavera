@@ -5,7 +5,7 @@ import { PrismaService } from "src/services/prisma/prisma.service";
 import { EnderecoService } from "../endereco/endereco.service";
 import { CreateClienteDto } from "./dto/create-cliente.dto";
 import { UpdateClienteDto } from "./dto/update-cliente.dto";
-import { ClienteEntity } from "./entities/cliente.entity";
+import { ClienteEntity, ReturnClient } from "./entities/cliente.entity";
 
 @Injectable()
 export class ClienteService {
@@ -73,7 +73,7 @@ export class ClienteService {
 		}
 	}
 
-	async findAll(page = 1, limit = 10): Promise<ClienteEntity[]> {
+	async findAll(page = 1, limit = 10): Promise<ReturnClient> {
 		if (page < 1) {
 			throw new HttpException(
 				"A página deve ser maior ou igual a 1",
@@ -98,6 +98,9 @@ export class ClienteService {
 			},
 		});
 
+		const totalClientes = await this.prisma.cliente.count();
+		const totalPages = Math.ceil(totalClientes / limit);
+
 		if (clientes.length === 0 && page > 1) {
 			throw new HttpException(
 				"A página solicitada não contém resultados",
@@ -105,7 +108,10 @@ export class ClienteService {
 			);
 		}
 
-		return clientes.map((cliente) => new ClienteEntity(cliente));
+		return {
+			clients: clientes.map((cliente) => new ClienteEntity(cliente)),
+			totalPages: totalPages,
+		};
 	}
 
 	async findOne(uuid: string): Promise<ClienteEntity> {
